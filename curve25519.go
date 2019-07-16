@@ -79,8 +79,9 @@ func core(Px, s, k, Gx []byte) {
 	for i := 31; i >= 0; i-- {
 		for j := 7; j >= 0; j-- {
 			/* swap arguments depending on bit */
-			bit1 := (k[i] & 0xFF) >> uint(j) & 1
-			bit0 := ^(k[i] & 0xFF) >> uint(j) & 1
+			uj := uint(j)
+			bit1 := (k[i] & 0xFF) >> uj & 1
+			bit0 := ^(k[i] & 0xFF) >> uj & 1
 
 			ax := x[bit0]
 			az := z[bit0]
@@ -305,8 +306,8 @@ func verify(Y, v, h, P []byte) {
 			montPrep(t1[0], t2[0], yx[0], yz[0])
 			montPrep(t1[1], t2[1], yx[1], yz[1])
 			montPrep(t1[2], t2[2], yx[2], yz[2])
-			uj := uint(j)
 
+			uj := uint(j)
 			k := ((vi ^ vi>>1) >> uj & 1) + ((hi ^ hi>>1) >> uj & 1)
 			montDbl(yx[2], yz[2], t1[k], t2[k], yx[0], yz[0])
 			k = (di >> uj & 2) ^ ((di >> uj & 1) << 1)
