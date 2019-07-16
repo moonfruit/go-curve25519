@@ -43,7 +43,9 @@ func GenerateKey() (sk *PrivateKey) {
 
 func GenerateKeyFrom(reader io.Reader) (sk *PrivateKey) {
 	sk = new(PrivateKey)
-	_, _ = io.ReadFull(reader, sk.raw[:])
+	if _, err := io.ReadFull(reader, sk.raw[:]); err != nil {
+		panic(err)
+	}
 	clamp(sk.raw[:])
 	return sk
 }
