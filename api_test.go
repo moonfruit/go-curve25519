@@ -4,20 +4,24 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
+var reader = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 func TestSharedSecret(t *testing.T) {
 	for i := 0; i < 10000; i++ {
-		private1 := GenerateKey()
+		private1 := GenerateKeyFrom(reader)
 		public1 := private1.Public()
 		require.True(t, public1.isCanonical())
 
-		private2 := GenerateKey()
+		private2 := GenerateKeyFrom(reader)
 		public2 := private2.Public()
 		require.True(t, public2.isCanonical())
 
@@ -63,12 +67,12 @@ func TestSignature(t *testing.T) {
 
 func TestMine(t *testing.T) {
 	for i := 0; i < 1000; i++ {
-		privateKey := GenerateKey()
+		privateKey := GenerateKeyFrom(reader)
 		publicKey := privateKey.Public()
 		tempPublicKey := privateKey.myPublic()
 		require.Equal(t, tempPublicKey, publicKey)
 
-		privateKey2 := GenerateKey()
+		privateKey2 := GenerateKeyFrom(reader)
 		publicKey2 := privateKey2.Public()
 		tempPublicKey = privateKey2.myPublic()
 		require.Equal(t, tempPublicKey, publicKey2)
@@ -84,7 +88,7 @@ func BenchmarkMine(b *testing.B) {
 		return func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				b.StopTimer()
-				privateKey := GenerateKey()
+				privateKey := GenerateKeyFrom(reader)
 				b.StartTimer()
 				f(privateKey)
 			}
@@ -103,8 +107,8 @@ func BenchmarkMine(b *testing.B) {
 		return func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				b.StopTimer()
-				privateKey := GenerateKey()
-				publicKey := GenerateKey().Public()
+				privateKey := GenerateKeyFrom(reader)
+				publicKey := GenerateKeyFrom(reader).Public()
 				b.StartTimer()
 				f(privateKey, publicKey)
 			}

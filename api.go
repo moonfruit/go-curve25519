@@ -38,8 +38,12 @@ type PrivateKey struct {
 }
 
 func GenerateKey() (sk *PrivateKey) {
+	return GenerateKeyFrom(rand.Reader)
+}
+
+func GenerateKeyFrom(reader io.Reader) (sk *PrivateKey) {
 	sk = new(PrivateKey)
-	_, _ = io.ReadFull(rand.Reader, sk.raw[:])
+	_, _ = io.ReadFull(reader, sk.raw[:])
 	clamp(sk.raw[:])
 	return sk
 }
