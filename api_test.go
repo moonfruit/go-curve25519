@@ -55,34 +55,32 @@ func TestSignature(t *testing.T) {
 		expected := NewSignature(bytes)
 
 		require.Equal(t, expected, actual)
+
+		result := Verify(message, actual, privateKey.Public(), true)
+		require.True(t, result)
 	}
 }
 
 func TestMine(t *testing.T) {
-	privateKeyBytes, _ := hex.DecodeString("836EAD388AE0E0EBB34C6B169AD9AC97AD3EA2A995B515A78E99B1CBB929ED5B")
-	privateKey := NewPrivateKey(privateKeyBytes)
-	publicKey := privateKey.Public()
-	tempPublicKey := privateKey.myPublic()
-	require.Equal(t, tempPublicKey, publicKey)
+	for i := 0; i < 1000; i++ {
+		privateKey := GenerateKey()
+		publicKey := privateKey.Public()
+		tempPublicKey := privateKey.myPublic()
+		require.Equal(t, tempPublicKey, publicKey)
 
-	privateKeyBytes2, _ := hex.DecodeString("089476EA4DE0D7A45E3ADBB8AA02AFC439CF552314F6734B7E19078AFBABC839")
-	privateKey2 := NewPrivateKey(privateKeyBytes2)
-	publicKey2 := privateKey2.Public()
-	tempPublicKey = privateKey2.myPublic()
-	require.Equal(t, tempPublicKey, publicKey2)
+		privateKey2 := GenerateKey()
+		publicKey2 := privateKey2.Public()
+		tempPublicKey = privateKey2.myPublic()
+		require.Equal(t, tempPublicKey, publicKey2)
 
-	sharedSecret := privateKey.SharedSecret(publicKey2)
-	sharedSecret2 := privateKey2.SharedSecret(publicKey)
-	require.Equal(t, sharedSecret, sharedSecret2)
-
-	sharedSecret3 := privateKey.mySharedSecret(publicKey2)
-	sharedSecret4 := privateKey2.mySharedSecret(publicKey)
-	require.Equal(t, sharedSecret, sharedSecret3)
-	require.Equal(t, sharedSecret3, sharedSecret4)
+		sharedSecret := privateKey.SharedSecret(publicKey2)
+		sharedSecret2 := privateKey.mySharedSecret(publicKey2)
+		require.Equal(t, sharedSecret, sharedSecret2)
+	}
 }
 
 func BenchmarkMine(b *testing.B) {
-	testPublic := func(f func (sk *PrivateKey)) func(b *testing.B) {
+	testPublic := func(f func(sk *PrivateKey)) func(b *testing.B) {
 		return func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				b.StopTimer()
@@ -101,7 +99,7 @@ func BenchmarkMine(b *testing.B) {
 		sk.myPublic()
 	}))
 
-	testSharedSecret := func(f func (sk *PrivateKey, pk *PublicKey)) func(b *testing.B) {
+	testSharedSecret := func(f func(sk *PrivateKey, pk *PublicKey)) func(b *testing.B) {
 		return func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				b.StopTimer()

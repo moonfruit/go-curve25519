@@ -3,7 +3,7 @@ package curve25519
 /* p[m..n+m-1] = q[m..n+m-1] + z * x */
 /* n is the size of x */
 /* n+m is the size of p and q */
-func mula_small(p []byte, q []byte, m int, x []byte, n int, z int) int {
+func mulaSmall(p []byte, q []byte, m int, x []byte, n int, z int) int {
 	v := 0
 	for i := 0; i < n; i++ {
 		v += int(q[i+m]&0xFF) + z*int(x[i]&0xFF)
@@ -21,7 +21,7 @@ func mula32(p []byte, x []byte, y []byte, t int, z int) int {
 	var w, i int
 	for ; i < t; i++ {
 		zy := z * int(y[i]&0xFF)
-		w += mula_small(p, p, i, x, n, zy) + int(p[i+n]&0xFF) + zy*int(x[n]&0xFF)
+		w += mulaSmall(p, p, i, x, n, zy) + int(p[i+n]&0xFF) + zy*int(x[n]&0xFF)
 		p[i+n] = byte(w)
 		w >>= 8
 	}
@@ -47,9 +47,9 @@ func divmod(q []byte, r []byte, n int, d []byte, t int) {
 			z |= int(r[n-1] & 0xFF)
 		}
 		z /= dt
-		rn += mula_small(r, r, n-t+1, d, t, -z)
+		rn += mulaSmall(r, r, n-t+1, d, t, -z)
 		q[n-t+1] = byte((z + rn) & 0xFF) /* rn is 0 or -1 (underflow) */
-		mula_small(r, r, n-t+1, d, t, -rn)
+		mulaSmall(r, r, n-t+1, d, t, -rn)
 		rn = int(r[n] & 0xFF)
 		r[n] = 0
 	}

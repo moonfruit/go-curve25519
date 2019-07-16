@@ -113,10 +113,10 @@ func core(Px, s, k, Gx []byte) {
 		dx.sub(dx, t1)        /* dx = t2 (Px - Gx)^2 - Py^2  */
 		dx[0] -= 39420360     /* dx = t2 (Px - Gx)^2 - Py^2 - Gy^2  */
 		t1.mul(dx, baseR2y)   /* t1 = -Py  */
-		if t1.isNegative() { /* sign is 1, so just copy  */
+		if t1.isNegative() {  /* sign is 1, so just copy  */
 			copy(s, k)
 		} else { /* sign is -1, so negate  */
-			mula_small(s, orderTimes8, 0, k, 32, -1)
+			mulaSmall(s, orderTimes8, 0, k, 32, -1)
 		}
 
 		/* reduce s mod q
@@ -130,7 +130,7 @@ func core(Px, s, k, Gx []byte) {
 		copy(temp1, order)
 		copy(s, egcd32(temp2, temp3, s, temp1))
 		if (s[31] & 0x80) != 0 {
-			mula_small(s, s, 0, order, 32, 1)
+			mulaSmall(s, s, 0, order, 32, 1)
 		}
 	}
 }
@@ -197,8 +197,8 @@ func sign(v, h, x, s []byte) bool {
 	// If v is negative, add the group order to it to become positive.
 	// If v was already positive we don't have to worry about overflow
 	// when adding the order because v < ORDER and 2*ORDER < 2^256
-	mula_small(v, x1, 0, h1, 32, -1)
-	mula_small(v, v, 0, order, 32, 1)
+	mulaSmall(v, x1, 0, h1, 32, -1)
+	mulaSmall(v, v, 0, order, 32, 1)
 
 	// tmp1 = (x-h)*s mod q
 	mula32(tmp1, v, s, 32, 1)
